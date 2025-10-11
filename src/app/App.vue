@@ -1,11 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { Login, OS } from '@/pages'
+import { useUsersStore } from '@/shared/stores'
+
+const usersStore = useUsersStore()
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <OS v-if="usersStore.currentUser" />
+  <Login v-else />
 </template>
 
 <style scoped></style>
