@@ -1,11 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-type User = {
-  id: string
-  name: string
-  image: string
-}
+import type { User } from '@/shared/types'
 
 type UserWithOptionalId = Omit<User, 'id'> & { id?: string }
 
@@ -21,7 +16,7 @@ const useUsersStore = defineStore('users', () => {
     if (!user.id) {
       user.id = crypto.randomUUID()
     }
-    users.value.push(user as User)
+    users.value.unshift(user as User)
     localStorage.setItem('users', JSON.stringify(users.value))
 
     return user as User
@@ -34,7 +29,9 @@ const useUsersStore = defineStore('users', () => {
 
   const setCurrentUser = (userId: string) => {
     currentUser.value = users.value.find((user) => user.id === userId)
-    localStorage.setItem('currentUser', JSON.stringify(currentUser.value))
+    if (currentUser.value) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser.value))
+    }
   }
 
   const logout = () => {
