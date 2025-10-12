@@ -12,6 +12,8 @@ const useUsersStore = defineStore('users', () => {
     localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')!) : undefined,
   )
 
+  const isLoading = ref<boolean>(true)
+
   const addUser = (user: UserWithOptionalId): User => {
     if (!user.id) {
       user.id = crypto.randomUUID()
@@ -44,9 +46,15 @@ const useUsersStore = defineStore('users', () => {
     localStorage.removeItem('users')
   }
 
+  const setLoading = (value: boolean) => {
+    isLoading.value = value
+  }
+
   return {
     users,
     currentUser,
+    isLoading,
+    setLoading,
     addUser,
     removeUser,
     setCurrentUser,

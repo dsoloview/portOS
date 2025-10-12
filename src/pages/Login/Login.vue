@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CreateUserForm, UserCardList } from '@/widgets'
+import { IconStack2 } from '@tabler/icons-vue'
 </script>
 
 <template>
@@ -9,26 +10,7 @@ import { CreateUserForm, UserCardList } from '@/widgets'
     <div class="login-container">
       <div class="os-header">
         <div class="os-logo">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 2L2 7L12 12L22 7L12 2Z"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M2 17L12 22L22 17"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M2 12L12 17L22 12"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <IconStack2 :size="48" stroke="1.5" />
         </div>
         <h1 class="os-title">PortOS</h1>
         <p class="os-subtitle">Выберите пользователя для входа в систему</p>
@@ -43,7 +25,6 @@ import { CreateUserForm, UserCardList } from '@/widgets'
       </div>
     </div>
 
-    <!-- Футер -->
     <div class="login-footer">
       <p>© 2025 PortOS.</p>
     </div>

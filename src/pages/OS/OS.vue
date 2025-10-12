@@ -8,6 +8,7 @@ const usersStore = useUsersStore()
 
 <template>
   <main class="os-container">
+    {{ usersStore.currentUser!.name }}
     <button @click="usersStore.logout">Logout</button>
   </main>
 </template>

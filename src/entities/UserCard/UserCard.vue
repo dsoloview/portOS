@@ -15,6 +15,7 @@ const handleDelete = () => {
 }
 
 const handleClick = () => {
+  usersStore.setLoading(true)
   usersStore.setCurrentUser(props.user.id)
 }
 </script>
