@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUsersStore } from '@/shared/stores'
 import { ref } from 'vue'
+import { BaseButton, BaseCard, BaseInput } from '@/shared/ui'
 
 const usersStore = useUsersStore()
 
@@ -28,53 +29,57 @@ const toggleCreateForm = () => {
 
 <template>
   <div class="create-user-container">
-    <button
+    <BaseButton
+      variant="ghost"
+      size="lg"
+      :full-width="true"
+      :disabled="showCreateForm"
       @click="toggleCreateForm"
       class="add-user-btn"
-      :class="{ 'form-active': showCreateForm }"
     >
-      <svg width="24" height="24" viewBox="0 0 24 24">
-        <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-      </svg>
+      <template #icon>
+        <svg width="24" height="24" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+        </svg>
+      </template>
       Create new user
-    </button>
+    </BaseButton>
 
     <div class="form-space" :class="{ expanded: showCreateForm }">
       <div class="form-wrapper" :class="{ visible: showCreateForm }">
-        <div class="create-form">
+        <BaseCard class="create-form">
           <div class="form-header">
             <h3>New user</h3>
-            <button @click="toggleCreateForm" class="close-btn">
+            <BaseButton variant="ghost" size="sm" @click="toggleCreateForm" class="close-btn">
               <svg width="20" height="20" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
                   d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
                 />
               </svg>
-            </button>
+            </BaseButton>
           </div>
 
           <form @submit.prevent="handleCreateUser" class="user-form">
-            <div class="input-group">
-              <label for="userName">Username</label>
-              <input
-                id="userName"
-                v-model="newUserName"
-                type="text"
-                placeholder="Enter username"
-                required
-                autocomplete="username"
-              />
-            </div>
+            <BaseInput
+              v-model="newUserName"
+              label="Username"
+              placeholder="Enter username"
+              :required="true"
+              autocomplete="username"
+              class="input-group"
+            />
 
             <div class="form-actions">
-              <button type="button" @click="toggleCreateForm" class="cancel-btn">Cancel</button>
-              <button type="submit" class="create-btn" :disabled="!newUserName.trim()">
+              <BaseButton variant="ghost" type="button" @click="toggleCreateForm">
+                Cancel
+              </BaseButton>
+              <BaseButton variant="primary" type="submit" :disabled="!newUserName.trim()">
                 Create
-              </button>
+              </BaseButton>
             </div>
           </form>
-        </div>
+        </BaseCard>
       </div>
     </div>
   </div>
@@ -224,65 +229,9 @@ const toggleCreateForm = () => {
   justify-content: flex-end;
 }
 
-.cancel-btn,
-.create-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.cancel-btn {
-  background: transparent;
-  color: #757575;
-}
-
-.cancel-btn:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.cancel-btn:focus {
-  outline: 2px solid #757575;
-  outline-offset: 2px;
-}
-
-.create-btn {
-  background: #1976d2;
-  color: white;
-}
-
-.create-btn:hover:not(:disabled) {
-  background: #1565c0;
-  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.3);
-}
-
-.create-btn:focus:not(:disabled) {
-  outline: 2px solid #1976d2;
-  outline-offset: 2px;
-}
-
-.create-btn:disabled {
-  background: #bdbdbd;
-  cursor: not-allowed;
-}
-
 @media (max-width: 768px) {
   .create-form {
     padding: 1rem;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .cancel-btn,
-  .create-btn {
-    width: 100%;
   }
 
   .form-space.expanded {

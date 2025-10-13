@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CreateUserForm, UserCardList } from '@/widgets'
-import { IconStack2 } from '@tabler/icons-vue'
+import { OSLogo } from '@/entities'
 </script>
 
 <template>
@@ -9,10 +9,7 @@ import { IconStack2 } from '@tabler/icons-vue'
 
     <div class="login-container">
       <div class="os-header">
-        <div class="os-logo">
-          <IconStack2 :size="48" stroke="1.5" />
-        </div>
-        <h1 class="os-title">PortOS</h1>
+        <OSLogo :size="48" show-title title-size="large" />
         <p class="os-subtitle">Выберите пользователя для входа в систему</p>
       </div>
 
@@ -66,23 +63,11 @@ import { IconStack2 } from '@tabler/icons-vue'
   margin-bottom: 1rem;
 }
 
-.os-logo {
-  margin-bottom: 1rem;
-  opacity: 0.9;
-}
-
-.os-title {
-  font-size: 2.5rem;
-  font-weight: 300;
-  margin: 0 0 0.5rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
 .os-subtitle {
   font-size: 1.1rem;
-  margin: 0;
   opacity: 0.9;
   font-weight: 400;
+  margin: 0.5rem 0 0;
 }
 
 .users-section {
@@ -110,10 +95,6 @@ import { IconStack2 } from '@tabler/icons-vue'
   .login-container {
     padding: 1rem;
     gap: 2rem;
-  }
-
-  .os-title {
-    font-size: 2rem;
   }
 }
 </style>

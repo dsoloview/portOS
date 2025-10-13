@@ -21,5 +21,6 @@ const usersStore = useUsersStore()
   justify-content: center;
   height: 100vh;
   background-color: #f0f0f0;
+  overflow: hidden;
 }
 </style>
