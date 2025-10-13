@@ -2,6 +2,7 @@
 import { useUsersStore } from '@/shared/stores'
 import { ref } from 'vue'
 import { BaseButton, BaseCard, BaseInput } from '@/shared/ui'
+import { IconX, IconPlus } from '@tabler/icons-vue'
 
 const usersStore = useUsersStore()
 
@@ -38,9 +39,7 @@ const toggleCreateForm = () => {
       class="add-user-btn"
     >
       <template #icon>
-        <svg width="24" height="24" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-        </svg>
+        <IconPlus size="24" />
       </template>
       Create new user
     </BaseButton>
@@ -51,12 +50,7 @@ const toggleCreateForm = () => {
           <div class="form-header">
             <h3>New user</h3>
             <BaseButton variant="ghost" size="sm" @click="toggleCreateForm" class="close-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                />
-              </svg>
+              <IconX size="20" />
             </BaseButton>
           </div>
 
