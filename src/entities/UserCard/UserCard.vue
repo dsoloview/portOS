@@ -32,7 +32,7 @@ const handleClick = () => {
       <p class="user-id">{{ user.id }}</p>
     </div>
 
-    <button class="delete-btn" @click="handleDelete" aria-label="Remove user">
+    <button class="delete-btn" @click.stop="handleDelete" aria-label="Remove user">
       <IconTrash :size="20" />
     </button>
   </div>
