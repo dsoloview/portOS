@@ -5,7 +5,6 @@ import { useUsersStore } from '@/shared/stores'
 const usersStore = useUsersStore()
 </script>
 
-
 <template>
   <div class="user-card-list-container">
     <div class="user-card-list">
