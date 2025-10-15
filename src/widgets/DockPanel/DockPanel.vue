@@ -42,11 +42,8 @@ const closeStartMenu = () => {
 
 <style scoped>
 .dock-panel {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   height: 48px;
+  width: 100%;
   background: rgba(248, 249, 250, 0.95);
   backdrop-filter: blur(12px);
   border-top: 1px solid #e5e7eb;
