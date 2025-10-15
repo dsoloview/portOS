@@ -46,23 +46,28 @@ const volumeLevel = computed(() => systemStore.volumeLevel)
 .system-tray {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tray-item {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ccc;
+  color: #6b7280;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 6px;
   transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(209, 213, 219, 0.6);
 }
 
 .tray-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(243, 244, 246, 0.8);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 </style>

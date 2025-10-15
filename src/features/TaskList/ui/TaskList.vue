@@ -21,10 +21,11 @@ const runningTasks = computed(() => taskStore.runningTasks)
 <style scoped>
 .task-list {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  padding: 4px;
 }
 
 .task-list::-webkit-scrollbar {

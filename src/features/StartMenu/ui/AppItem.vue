@@ -9,6 +9,7 @@ defineProps<Props>()
 defineEmits<{
   click: []
 }>()
+
 </script>
 
 <template>
@@ -31,14 +32,15 @@ defineEmits<{
   flex-direction: column;
   align-items: center;
   padding: 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
 }
 
 .app-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .app-icon {
@@ -56,19 +58,20 @@ defineEmits<{
 .default-icon {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #4a90e2, #357abd);
-  border-radius: 4px;
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: bold;
   font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .app-name {
   font-size: 11px;
-  color: #ccc;
+  color: #374151;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

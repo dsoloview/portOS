@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const currentTime = ref(new Date())
-let timeInterval: NodeJS.Timeout
+let timeInterval: number | null = null
 
 const formatTime = (date: Date) => {
   return date.toLocaleTimeString('ru-RU', {
@@ -42,29 +42,36 @@ onUnmounted(() => {
   </div>
 </template>
 
+
 <style scoped>
 .clock-widget {
-  padding: 4px 8px;
+  padding: 6px 12px;
   text-align: right;
   cursor: pointer;
   transition: all 0.2s ease;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(209, 213, 219, 0.5);
 }
 
 .clock-widget:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  background: rgba(243, 244, 246, 0.8);
+  border-color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .time {
-  color: white;
+  color: #374151;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.2;
 }
 
 .date {
-  color: #aaa;
+  color: #6b7280;
   font-size: 11px;
   line-height: 1.2;
+  font-weight: 500;
 }
 </style>

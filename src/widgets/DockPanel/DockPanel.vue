@@ -39,6 +39,7 @@ const closeStartMenu = () => {
   </div>
 </template>
 
+
 <style scoped>
 .dock-panel {
   position: fixed;
@@ -46,9 +47,10 @@ const closeStartMenu = () => {
   left: 0;
   right: 0;
   height: 48px;
-  background: linear-gradient(180deg, #2a2a2a 0%, #1e1e1e 100%);
-  border-top: 1px solid #404040;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  background: rgba(248, 249, 250, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
 
@@ -63,7 +65,7 @@ const closeStartMenu = () => {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 0 8px;
+  padding: 0 12px;
 }
 
 .panel-left {
@@ -72,7 +74,7 @@ const closeStartMenu = () => {
 
 .panel-center {
   flex: 1;
-  margin: 0 8px;
+  margin: 0 12px;
   min-width: 0;
 }
 
@@ -80,6 +82,6 @@ const closeStartMenu = () => {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 </style>
