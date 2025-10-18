@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 export interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'

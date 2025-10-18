@@ -7,6 +7,7 @@ export interface ShortcutEntity {
   name: string
   icon: string
   coordinate: { x: number; y: number }
+  selected: boolean
   createdAt: Date
   updatedAt: Date
 }

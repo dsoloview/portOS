@@ -42,6 +42,17 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
     })
   }
 
+  const setSelected = (id: string, selected: boolean) => {
+    const index = shortcuts.value.findIndex((s) => s.id === id)
+    if (index !== -1) {
+      shortcuts.value[index] = { ...shortcuts.value[index], selected } as ShortcutEntity
+    }
+  }
+
+  const unselectShortcuts = () => {
+    shortcuts.value = shortcuts.value.map((s) => ({ ...s, selected: false }))
+  }
+
   const deleteShortcut = async (id: string): Promise<void> => {
     await portOsDatabase.shortcuts.delete(id)
     shortcuts.value = shortcuts.value.filter((s) => s.id !== id)
@@ -58,5 +69,7 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
     updateShortcut,
     deleteShortcut,
     deleteShortcutsByUserId,
+    setSelected,
+    unselectShortcuts,
   }
 })

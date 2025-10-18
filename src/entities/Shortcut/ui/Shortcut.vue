@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useShortcutsStore } from '@/entities'
 import type { ShortcutEntity } from '@/shared/db'
+import { ContextMenu, createMenuItem, useContextMenu } from '@/shared/ui'
+import { useDragAndDrop, useClickOutside } from '@/shared/composables'
 
 interface Props {
   shortcut: ShortcutEntity
@@ -15,36 +17,23 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const isDragInitiated = ref(false)
-const isDragging = ref(false)
-const hasDragged = ref(false)
-
-const dragThreshold = 5
-let dragOffset = { x: 0, y: 0 }
-let parentRect: DOMRect | null = null
-
+const shortcutRef = ref<HTMLElement>()
+const contextMenu = useContextMenu()
 const shortcutsStore = useShortcutsStore()
 
-const shortcutStyle = computed(() => ({
-  left: `${props.shortcut.coordinate.x}%`,
-  top: `${props.shortcut.coordinate.y}%`,
-}))
-
-const shortcutClasses = computed(() => ['shortcut', { 'shortcut--dragging': isDragging.value }])
-
-const getParentRect = (element: HTMLElement): DOMRect => {
-  return element.parentElement?.getBoundingClientRect() || element.getBoundingClientRect()
-}
-
-const pixelsToPercent = (pixels: number, containerSize: number): number => {
-  return (pixels / containerSize) * 100
-}
-
-const percentToPixels = (percent: number, containerSize: number): number => {
-  return (percent / 100) * containerSize
-}
+const {
+  isDragging,
+  hasDragged,
+  handleDragStart
+} = useDragAndDrop({
+  onPositionUpdate: (coordinate) => {
+    shortcutsStore.updateShortcut(props.shortcut.id, { coordinate })
+  }
+})
 
 const handleClick = () => {
+  shortcutsStore.setSelected(props.shortcut.id, true)
+
   if (hasDragged.value) {
     hasDragged.value = false
     return
@@ -58,95 +47,52 @@ const handleDoubleClick = () => {
   }
 }
 
-const handleDragStart = (event: MouseEvent) => {
-  const element = event.target as HTMLElement
-  parentRect = getParentRect(element)
-
-  isDragInitiated.value = true
-  hasDragged.value = false
-
-  const currentX = percentToPixels(props.shortcut.coordinate.x, parentRect.width)
-  const currentY = percentToPixels(props.shortcut.coordinate.y, parentRect.height)
-
-  dragOffset = {
-    x: event.clientX - parentRect.left - currentX,
-    y: event.clientY - parentRect.top - currentY,
+useClickOutside(shortcutRef, () => {
+  if (props.shortcut.selected) {
+    shortcutsStore.setSelected(props.shortcut.id, false)
   }
-
-  document.addEventListener('mousemove', handleDrag, { passive: true })
-  document.addEventListener('mouseup', handleDragEnd, { once: true })
-}
-
-const handleDrag = (event: MouseEvent) => {
-  if (!isDragInitiated.value || !parentRect) return
-
-  const deltaX = Math.abs(
-    event.clientX -
-      (parentRect.left + percentToPixels(props.shortcut.coordinate.x, parentRect.width)),
-  )
-  const deltaY = Math.abs(
-    event.clientY -
-      (parentRect.top + percentToPixels(props.shortcut.coordinate.y, parentRect.height)),
-  )
-  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-
-  if (!isDragging.value && distance > dragThreshold) {
-    isDragging.value = true
-  }
-
-  if (isDragging.value) {
-    hasDragged.value = true
-
-    const newPixelX = event.clientX - parentRect.left - dragOffset.x
-    const newPixelY = event.clientY - parentRect.top - dragOffset.y
-
-    const shortcutWidth = 80
-    const shortcutHeight = 80
-
-    const shortcutWidthPercent = pixelsToPercent(shortcutWidth, parentRect.width)
-    const shortcutHeightPercent = pixelsToPercent(shortcutHeight, parentRect.height)
-
-    const newPercentX = Math.max(
-      0,
-      Math.min(100 - shortcutWidthPercent, pixelsToPercent(newPixelX, parentRect.width)),
-    )
-    const newPercentY = Math.max(
-      0,
-      Math.min(100 - shortcutHeightPercent, pixelsToPercent(newPixelY, parentRect.height)),
-    )
-
-    const newCoordinate = {
-      x: Math.round(newPercentX * 100) / 100,
-      y: Math.round(newPercentY * 100) / 100,
-    }
-
-    shortcutsStore.updateShortcut(props.shortcut.id, {
-      coordinate: newCoordinate,
-    })
-  }
-}
-
-const handleDragEnd = () => {
-  isDragInitiated.value = false
-  isDragging.value = false
-  parentRect = null
-  document.removeEventListener('mousemove', handleDrag)
-}
-
-onBeforeUnmount(() => {
-  document.removeEventListener('mousemove', handleDrag)
-  document.removeEventListener('mouseup', handleDragEnd)
+}, {
+  excludeAltKey: true
 })
+
+const handleDelete = () => {
+  shortcutsStore.deleteShortcut(props.shortcut.id)
+}
+
+const menuItems = [createMenuItem('delete', 'Удалить', handleDelete)]
+
+const showMenu = (event: MouseEvent) => {
+  contextMenu.show(event, menuItems)
+}
+
+const shortcutStyle = computed(() => ({
+  left: `${props.shortcut.coordinate.x}%`,
+  top: `${props.shortcut.coordinate.y}%`,
+}))
+
+const shortcutClasses = computed(() => [
+  'shortcut',
+  {
+    'shortcut--dragging': isDragging.value,
+    'shortcut--selected': props.shortcut.selected
+  },
+])
+
+const handleMouseDown = (event: MouseEvent) => {
+  handleDragStart(event, props.shortcut.coordinate)
+}
 </script>
 
 <template>
   <div
+    ref="shortcutRef"
     :style="shortcutStyle"
     :class="shortcutClasses"
     :title="shortcut.name"
     @click="handleClick"
     @dblclick="handleDoubleClick"
-    @mousedown="handleDragStart"
+    @mousedown.left="handleMouseDown"
+    @contextmenu="showMenu"
   >
     <div class="shortcut__icon">
       {{ shortcut.icon }}
@@ -154,6 +100,12 @@ onBeforeUnmount(() => {
     <div class="shortcut__title">
       {{ shortcut.name }}
     </div>
+    <ContextMenu
+      :items="contextMenu.items.value"
+      :position="contextMenu.position"
+      :visible="contextMenu.visible.value"
+      @close="contextMenu.hide"
+    />
   </div>
 </template>
 
@@ -183,7 +135,8 @@ onBeforeUnmount(() => {
   cursor: grabbing;
 }
 
-.shortcut:hover:not(.shortcut--dragging) {
+.shortcut:hover:not(.shortcut--dragging),
+.shortcut--selected {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
