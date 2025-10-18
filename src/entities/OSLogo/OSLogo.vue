@@ -26,7 +26,7 @@ const titleClasses = {
 <template>
   <div class="portos-logo">
     <div class="logo-icon">
-      <IconStack2 :size="props.size" :stroke="props.stroke" />
+      <IconStack2 :size="props.size" :strokeWidth="props.stroke" />
     </div>
     <h1 v-if="props.showTitle" :class="['logo-title', titleClasses[props.titleSize]]">
       PortOS
