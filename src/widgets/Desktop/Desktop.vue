@@ -14,6 +14,7 @@ onMounted(async () => {
     userId: usersStore!.currentUser!.id,
     icon: '📁',
     name: 'Picture',
+    selected: false,
     coordinate: { x: 0, y: 0, xPixels: 0, yPixels: 0 },
   })
   await shortcutsStore.loadShortcuts()
