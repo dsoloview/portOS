@@ -58,6 +58,73 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
     shortcuts.value = shortcuts.value.filter((s) => s.id !== id)
   }
 
+  const deleteSelectedShortcuts = async (): Promise<void> => {
+    const selectedShortcuts = shortcuts.value.filter((s) => s.selected)
+    for (const shortcut of selectedShortcuts) {
+      await deleteShortcut(shortcut.id)
+    }
+  }
+
+  const hasIntersectingShortcuts = (
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+  ): boolean => {
+    return shortcuts.value.some((shortcut) => {
+      const { xPixels, yPixels } = shortcut.coordinate
+      const shortcutLeft = xPixels
+      const shortcutRight = xPixels + 80
+      const shortcutTop = yPixels
+      const shortcutBottom = yPixels + 80
+      return !(
+        endX < shortcutLeft ||
+        startX > shortcutRight ||
+        endY < shortcutTop ||
+        startY > shortcutBottom
+      )
+    })
+  }
+
+  const selectIntersectedShortcuts = async (
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+  ): Promise<number> => {
+    const selectionLeft = Math.min(startX, endX)
+    const selectionRight = Math.max(startX, endX)
+    const selectionTop = Math.min(startY, endY)
+    const selectionBottom = Math.max(startY, endY)
+
+    let selectedShortcuts = 0
+    shortcuts.value = shortcuts.value.map((shortcut) => {
+      const { xPixels, yPixels } = shortcut.coordinate
+      const shortcutLeft = xPixels
+      const shortcutRight = xPixels + 80
+      const shortcutTop = yPixels
+      const shortcutBottom = yPixels + 80
+
+      const isIntersected = !(
+        selectionRight < shortcutLeft ||
+        selectionLeft > shortcutRight ||
+        selectionBottom < shortcutTop ||
+        selectionTop > shortcutBottom
+      )
+
+      if (isIntersected) {
+        selectedShortcuts += 1
+      }
+
+      return {
+        ...shortcut,
+        selected: isIntersected,
+      }
+    })
+
+    return selectedShortcuts
+  }
+
   const deleteShortcutsByUserId = async (userId: string): Promise<void> => {
     await portOsDatabase.shortcuts.where('userId').equals(userId).delete()
   }
@@ -71,5 +138,8 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
     deleteShortcutsByUserId,
     setSelected,
     unselectShortcuts,
+    deleteSelectedShortcuts,
+    selectIntersectedShortcuts,
+    hasIntersectingShortcuts
   }
 })

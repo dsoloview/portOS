@@ -56,7 +56,7 @@ useClickOutside(shortcutRef, () => {
 })
 
 const handleDelete = () => {
-  shortcutsStore.deleteShortcut(props.shortcut.id)
+  shortcutsStore.deleteSelectedShortcuts()
 }
 
 const menuItems = [createMenuItem('delete', 'Удалить', handleDelete)]

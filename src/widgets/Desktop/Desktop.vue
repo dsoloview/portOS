@@ -3,6 +3,7 @@ import { Shortcut } from '@/entities'
 import { useShortcutsStore } from '@/entities'
 import { onMounted } from 'vue'
 import { useUsersStore } from '@/shared/stores'
+import { Selector } from '@/features/Selector'
 
 const shortcutsStore = useShortcutsStore()
 const usersStore = useUsersStore()
@@ -13,7 +14,7 @@ onMounted(async () => {
     userId: usersStore!.currentUser!.id,
     icon: '📁',
     name: 'Picture',
-    coordinate: { x: 0, y: 0 },
+    coordinate: { x: 0, y: 0, xPixels: 0, yPixels: 0 },
   })
   await shortcutsStore.loadShortcuts()
 })
@@ -29,13 +30,16 @@ const handleShortcutDoubleClick = (name: string) => {
 
 <template>
   <div class="desktop">
-    <Shortcut
-      v-for="shortcut in shortcutsStore.shortcuts"
-      :shortcut="shortcut"
-      :key="shortcut.id"
-      @click="handleShortcutClick(shortcut.name)"
-      @double-click="handleShortcutDoubleClick(shortcut.name)"
-    />
+    <Selector class="selector">
+      <Shortcut
+        class="shortcut"
+        v-for="shortcut in shortcutsStore.shortcuts"
+        :shortcut="shortcut"
+        :key="shortcut.id"
+        @click="handleShortcutClick(shortcut.name)"
+        @double-click="handleShortcutDoubleClick(shortcut.name)"
+      />
+    </Selector>
   </div>
 </template>
 

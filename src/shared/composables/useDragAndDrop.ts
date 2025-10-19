@@ -11,7 +11,7 @@ interface DragHandlers {
 }
 
 interface UseDragAndDropOptions {
-  onPositionUpdate: (coordinate: { x: number; y: number }) => void
+  onPositionUpdate: (coordinate: { x: number; y: number, xPixels: number, yPixels: number }) => void
   threshold?: number
   elementSize?: { width: number; height: number }
 }
@@ -87,6 +87,8 @@ export function useDragAndDrop(options: UseDragAndDropOptions): DragState & Drag
       onPositionUpdate({
         x: Math.round(newPercentX * 100) / 100,
         y: Math.round(newPercentY * 100) / 100,
+        xPixels: newPixelX,
+        yPixels: newPixelY,
       })
     }
   }
