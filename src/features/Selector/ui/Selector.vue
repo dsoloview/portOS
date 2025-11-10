@@ -87,7 +87,12 @@ const rectangleStyle = computed(() => {
     @mouseup="handleMouseUp"
     @click="handleClick"
   >
-    <div class="selector__field" ref="selectorField" :style="rectangleStyle"></div>
+    <div
+      class="selector__field"
+      ref="selectorField"
+      :style="rectangleStyle"
+      v-if="isSelecting"
+    ></div>
     <slot />
   </div>
 </template>

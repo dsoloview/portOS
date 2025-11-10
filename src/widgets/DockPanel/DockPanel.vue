@@ -15,22 +15,17 @@ const closeStartMenu = () => {
 
 <template>
   <div class="dock-panel">
-    <!-- Стартовое меню (появляется поверх панели) -->
     <StartMenu v-if="isStartMenuOpen" @close="closeStartMenu" class="start-menu-overlay" />
 
-    <!-- Основная панель -->
     <div class="panel-content">
-      <!-- Левая часть - кнопка Пуск -->
       <div class="panel-left">
         <StartButton @click="toggleStartMenu" :active="isStartMenuOpen" />
       </div>
 
-      <!-- Центральная часть - список задач -->
       <div class="panel-center">
         <TaskList />
       </div>
 
-      <!-- Правая часть - системный трей и время -->
       <div class="panel-right">
         <SystemTray />
         <ClockWidget />
@@ -38,7 +33,6 @@ const closeStartMenu = () => {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .dock-panel {
