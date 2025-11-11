@@ -6,7 +6,7 @@ export interface ShortcutEntity {
   userId: string
   name: string
   icon: string
-  coordinate: { x: number; y: number, xPixels: number, yPixels: number }
+  coordinate: { x: number; y: number }
   selected: boolean
   createdAt: Date
   updatedAt: Date

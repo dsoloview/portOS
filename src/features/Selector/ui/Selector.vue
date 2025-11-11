@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useShortcutsStore } from '@/entities'
+import useSelectorStore from '@/shared/stores/selectorStore.ts'
 
-const isSelecting = ref(false)
 const wasSelected = ref(false)
 const selectorField = ref<HTMLDivElement | null>(null)
 const shortcutsStore = useShortcutsStore()
+const selectorStore = useSelectorStore()
 
 const startX = ref(0)
 const startY = ref(0)
@@ -25,7 +26,7 @@ const handleMouseDown = (event: MouseEvent) => {
     return
   }
 
-  isSelecting.value = true
+  selectorStore.startSelecting()
   wasSelected.value = false
   startX.value = event.clientX
   startY.value = event.clientY
@@ -34,7 +35,7 @@ const handleMouseDown = (event: MouseEvent) => {
 }
 
 const handleMouseMove = async (event: MouseEvent) => {
-  if (isSelecting.value) {
+  if (selectorStore.isSelecting) {
     endX.value = event.clientX
     endY.value = event.clientY
 
@@ -52,7 +53,7 @@ const handleMouseMove = async (event: MouseEvent) => {
 }
 
 const handleMouseUp = () => {
-  isSelecting.value = false
+  selectorStore.stopSelecting()
 }
 
 const handleClick = (event: MouseEvent) => {
@@ -65,7 +66,7 @@ const handleClick = (event: MouseEvent) => {
 }
 
 const rectangleStyle = computed(() => {
-  if (!isSelecting.value) return {}
+  if (!selectorStore.isSelecting) return {}
   const x = Math.min(startX.value, endX.value)
   const y = Math.min(startY.value, endY.value)
   const width = Math.abs(endX.value - startX.value)
@@ -91,7 +92,7 @@ const rectangleStyle = computed(() => {
       class="selector__field"
       ref="selectorField"
       :style="rectangleStyle"
-      v-if="isSelecting"
+      v-if="selectorStore.isSelecting"
     ></div>
     <slot />
   </div>
@@ -107,7 +108,7 @@ const rectangleStyle = computed(() => {
   position: absolute;
   border: 2px solid #007bff;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 900;
   background-color: rgba(0, 123, 255, 0.2);
 }
 </style>

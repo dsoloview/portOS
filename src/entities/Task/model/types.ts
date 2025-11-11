@@ -4,4 +4,5 @@ export interface Task {
   icon?: string
   isActive: boolean
   appId: string
+  isHidden: boolean
 }

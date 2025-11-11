@@ -1,4 +1,5 @@
 import { ref, type Ref } from 'vue'
+import { percentToPixels, pixelsToPercent } from '@/shared/helpers'
 
 interface DragState {
   isDragInitiated: Ref<boolean>
@@ -11,7 +12,7 @@ interface DragHandlers {
 }
 
 interface UseDragAndDropOptions {
-  onPositionUpdate: (coordinate: { x: number; y: number, xPixels: number, yPixels: number }) => void
+  onPositionUpdate: (coordinate: { x: number; y: number }) => void
   threshold?: number
   elementSize?: { width: number; height: number }
 }
@@ -26,14 +27,6 @@ export function useDragAndDrop(options: UseDragAndDropOptions): DragState & Drag
   let dragOffset = { x: 0, y: 0 }
   let parentRect: DOMRect | null = null
 
-  const pixelsToPercent = (pixels: number, containerSize: number): number => {
-    return (pixels / containerSize) * 100
-  }
-
-  const percentToPixels = (percent: number, containerSize: number): number => {
-    return (percent / 100) * containerSize
-  }
-
   const handleDragStart = (event: MouseEvent, currentPosition: { x: number; y: number }) => {
     const element = event.target as HTMLElement
     parentRect = element.parentElement?.getBoundingClientRect() || element.getBoundingClientRect()
@@ -41,8 +34,8 @@ export function useDragAndDrop(options: UseDragAndDropOptions): DragState & Drag
     isDragInitiated.value = true
     hasDragged.value = false
 
-    const currentX = percentToPixels(currentPosition.x, parentRect.width)
-    const currentY = percentToPixels(currentPosition.y, parentRect.height)
+    const currentX = percentToPixels(currentPosition.x, false)
+    const currentY = percentToPixels(currentPosition.y, true)
 
     dragOffset = {
       x: event.clientX - parentRect.left - currentX,
@@ -72,23 +65,21 @@ export function useDragAndDrop(options: UseDragAndDropOptions): DragState & Drag
       const newPixelX = event.clientX - parentRect.left - dragOffset.x
       const newPixelY = event.clientY - parentRect.top - dragOffset.y
 
-      const shortcutWidthPercent = pixelsToPercent(elementSize.width, parentRect.width)
-      const shortcutHeightPercent = pixelsToPercent(elementSize.height, parentRect.height)
+      const shortcutWidthPercent = pixelsToPercent(elementSize.width, false)
+      const shortcutHeightPercent = pixelsToPercent(elementSize.height, true)
 
       const newPercentX = Math.max(
         0,
-        Math.min(100 - shortcutWidthPercent, pixelsToPercent(newPixelX, parentRect.width)),
+        Math.min(100 - shortcutWidthPercent, pixelsToPercent(newPixelX, false)),
       )
       const newPercentY = Math.max(
         0,
-        Math.min(100 - shortcutHeightPercent, pixelsToPercent(newPixelY, parentRect.height)),
+        Math.min(100 - shortcutHeightPercent, pixelsToPercent(newPixelY, true)),
       )
 
       onPositionUpdate({
         x: Math.round(newPercentX * 100) / 100,
         y: Math.round(newPercentY * 100) / 100,
-        xPixels: newPixelX,
-        yPixels: newPixelY,
       })
     }
   }

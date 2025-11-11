@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useUsersStore } from '@/shared/stores'
 import { portOsDatabase, type ShortcutEntity } from '@/shared/db'
+import { percentToPixels } from '@/shared/helpers'
 
 export const useShortcutsStore = defineStore('shortcuts', () => {
   const usersStore = useUsersStore()
@@ -72,7 +73,9 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
     endY: number,
   ): boolean => {
     return shortcuts.value.some((shortcut) => {
-      const { xPixels, yPixels } = shortcut.coordinate
+      const { x, y } = shortcut.coordinate
+      const xPixels = percentToPixels(x, false)
+      const yPixels = percentToPixels(y, true)
       const shortcutLeft = xPixels
       const shortcutRight = xPixels + 80
       const shortcutTop = yPixels
@@ -99,7 +102,9 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
 
     let selectedShortcuts = 0
     shortcuts.value = shortcuts.value.map((shortcut) => {
-      const { xPixels, yPixels } = shortcut.coordinate
+      const { x, y } = shortcut.coordinate
+      const xPixels = percentToPixels(x, false)
+      const yPixels = percentToPixels(y, true)
       const shortcutLeft = xPixels
       const shortcutRight = xPixels + 80
       const shortcutTop = yPixels

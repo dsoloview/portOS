@@ -6,6 +6,11 @@ import { useTaskStore } from '@/entities'
 const taskStore = useTaskStore()
 
 const runningTasks = computed(() => taskStore.runningTasks)
+
+const showTask = (id: string) => {
+  taskStore.makeActive(id)
+  taskStore.showTask(id)
+}
 </script>
 
 <template>
@@ -14,6 +19,7 @@ const runningTasks = computed(() => taskStore.runningTasks)
       v-for="task in runningTasks"
       :key="task.id"
       :task="task"
+      @click="showTask(task.id)"
     />
   </div>
 </template>
