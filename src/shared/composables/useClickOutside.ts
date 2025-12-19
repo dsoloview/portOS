@@ -1,13 +1,13 @@
-import { onMounted, onBeforeUnmount, type Ref } from 'vue'
+import { onMounted, onBeforeUnmount, type ShallowRef } from 'vue'
 
 interface UseClickOutsideOptions {
   excludeAltKey?: boolean
 }
 
 export function useClickOutside(
-  target: Ref<HTMLElement | undefined>,
+  target: Readonly<ShallowRef<HTMLDivElement | null>>,
   handler: () => void,
-  options: UseClickOutsideOptions = {}
+  options: UseClickOutsideOptions = {},
 ) {
   const { excludeAltKey = false } = options
 

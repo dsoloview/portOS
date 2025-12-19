@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 import { useShortcutsStore } from '@/entities'
 import type { ShortcutEntity } from '@/shared/db'
 import { ContextMenu, createMenuItem, useContextMenu } from '@/shared/ui'
-import { useDragAndDrop, useClickOutside } from '@/shared/composables'
+import { useClickOutside } from '@/shared/composables'
+import { useDraggable } from '@vueuse/core'
+import { percentToPixels, pixelsToPercent } from '@/shared/helpers'
 
 interface Props {
   shortcut: ShortcutEntity
@@ -17,18 +19,36 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const shortcutRef = ref<HTMLElement>()
+const shortcutRef = useTemplateRef('shortcutRef')
 const contextMenu = useContextMenu()
 const shortcutsStore = useShortcutsStore()
+const hasDragged = ref(false)
 
-const {
-  isDragging,
-  hasDragged,
-  handleDragStart
-} = useDragAndDrop({
-  onPositionUpdate: (coordinate) => {
-    shortcutsStore.updateShortcut(props.shortcut.id, { coordinate })
-  }
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max)
+
+const { x, y, isDragging, position } = useDraggable(shortcutRef, {
+  initialValue: {
+    x: percentToPixels(props.shortcut.coordinate.x, false),
+    y: percentToPixels(props.shortcut.coordinate.y, true),
+  },
+  containerElement: shortcutRef.value?.parentElement,
+  preventDefault: true,
+  onMove: (pos) => {
+    const el = shortcutRef.value
+    const container = el?.parentElement
+    if (!el || !container) return
+
+    const cr = container.getBoundingClientRect()
+
+    const w = 80
+    const h = 80
+
+    const maxX = Math.max(0, cr.width - w)
+    const maxY = Math.max(0, cr.height - h)
+
+    x.value = clamp(pos.x, 0, maxX)
+    y.value = clamp(pos.y, 0, maxY)
+  },
 })
 
 const handleClick = () => {
@@ -47,12 +67,31 @@ const handleDoubleClick = () => {
   }
 }
 
-useClickOutside(shortcutRef, () => {
-  if (props.shortcut.selected) {
-    shortcutsStore.setSelected(props.shortcut.id, false)
+useClickOutside(
+  shortcutRef,
+  () => {
+    if (props.shortcut.selected) {
+      shortcutsStore.setSelected(props.shortcut.id, false)
+    }
+  },
+  {
+    excludeAltKey: true,
+  },
+)
+
+watch(isDragging, () => {
+  if (isDragging.value) {
+    hasDragged.value = true
+    return
   }
-}, {
-  excludeAltKey: true
+  if (!isDragging.value && hasDragged.value) {
+    const xPerc = pixelsToPercent(position.value.x, false)
+    const yPerc = pixelsToPercent(position.value.y, true)
+    shortcutsStore.updateShortcut(props.shortcut.id, { coordinate: { x: xPerc, y: yPerc } })
+    setTimeout(() => {
+      hasDragged.value = false
+    }, 1000)
+  }
 })
 
 const handleDelete = () => {
@@ -65,22 +104,22 @@ const showMenu = (event: MouseEvent) => {
   contextMenu.show(event, menuItems)
 }
 
-const shortcutStyle = computed(() => ({
-  left: `${props.shortcut.coordinate.x}%`,
-  top: `${props.shortcut.coordinate.y}%`,
-}))
+const shortcutStyle = computed(() => {
+  const xPercent = pixelsToPercent(position.value.x, false)
+  const yPercent = pixelsToPercent(position.value.y, true)
+  return {
+    left: `${xPercent}%`,
+    top: `${yPercent}%`,
+  }
+})
 
 const shortcutClasses = computed(() => [
   'shortcut',
   {
     'shortcut--dragging': isDragging.value,
-    'shortcut--selected': props.shortcut.selected
+    'shortcut--selected': props.shortcut.selected,
   },
 ])
-
-const handleMouseDown = (event: MouseEvent) => {
-  handleDragStart(event, props.shortcut.coordinate)
-}
 </script>
 
 <template>
@@ -91,7 +130,6 @@ const handleMouseDown = (event: MouseEvent) => {
     :title="shortcut.name"
     @click="handleClick"
     @dblclick="handleDoubleClick"
-    @mousedown.left="handleMouseDown"
     @contextmenu="showMenu"
   >
     <div class="shortcut__icon">

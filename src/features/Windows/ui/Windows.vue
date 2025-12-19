@@ -19,6 +19,7 @@ const minimizeWindow = (id: string) => {
 
 <template>
   <Window
+    :id="task.id"
     v-for="task in taskStore.shownTasks"
     :isActive="task.isActive"
     :key="task.id"
@@ -27,7 +28,6 @@ const minimizeWindow = (id: string) => {
     @minimize="minimizeWindow(task.id)"
     @close="closeWindow(task.id)"
   >
-    {{ task.name }} {{ task.isActive }}
   </Window>
 </template>
 

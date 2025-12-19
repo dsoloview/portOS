@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useDragAndDrop } from '@/shared/composables'
+import { ref, computed, useTemplateRef } from 'vue'
 import useSelectorStore from '@/shared/stores/selectorStore.ts'
+import { useDraggable } from '@vueuse/core'
+import { percentToPixels } from '@/shared/helpers'
+import { useTaskStore } from '@/entities'
 
 interface Props {
+  id: string
   title?: string
   width?: number
   height?: number
@@ -30,33 +33,68 @@ const props = withDefaults(defineProps<Props>(), {
   isActive: false,
 })
 
+const taskStore = useTaskStore()
 const selectorStore = useSelectorStore()
-const windowRef = ref<HTMLElement>()
+const windowRef = useTemplateRef('windowRef')
+const titleBarRef = useTemplateRef('titleBar')
 const isMaximized = ref(props.maximized)
-
-const windowPosition = ref({
-  x: props.x,
-  y: props.y,
-})
+const isDragInitialized = ref(false)
 
 const windowSize = ref({
   width: props.width,
   height: props.height,
 })
 
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max)
+
+const { isDragging, x, y } = useDraggable(windowRef, {
+  preventDefault: true,
+  handle: titleBarRef,
+  initialValue: {
+    x: percentToPixels(props.x, false),
+    y: percentToPixels(props.y, true),
+  },
+  onStart: () => {
+    taskStore.makeActive(props.id)
+    isDragInitialized.value = true
+  },
+  onMove: (pos) => {
+    const el = windowRef.value
+    const container = el?.parentElement
+    if (!el || !container) return
+
+    const cr = container.getBoundingClientRect()
+
+    const w = windowSize.value.width
+    const h = windowSize.value.height
+
+    const maxX = Math.max(0, cr.width - w)
+    const maxY = Math.max(0, cr.height - h)
+
+    x.value = clamp(pos.x, 0, maxX)
+    y.value = clamp(pos.y, 0, maxY)
+  },
+  onEnd: () => {
+    isDragInitialized.value = false
+  },
+  disabled: isMaximized,
+})
+
 const windowStyle = computed(() => {
   const baseStyle: Record<string, string> = {
-    ...(isMaximized.value ? {
-      width: '100vw',
-      height: '100vh',
-      left: '0px',
-      top: '0px',
-    } : {
-      width: windowSize.value.width + 'px',
-      height: windowSize.value.height + 'px',
-      left: windowPosition.value.x + '%',
-      top: windowPosition.value.y + '%',
-    })
+    ...(isMaximized.value
+      ? {
+          width: '100vw',
+          height: '100vh',
+          left: '0px',
+          top: '0px',
+        }
+      : {
+          width: windowSize.value.width + 'px',
+          height: windowSize.value.height + 'px',
+          left: x.value + 'px',
+          top: y.value + 'px',
+        }),
   }
 
   baseStyle.zIndex = props.isActive ? '1000' : '999'
@@ -68,32 +106,8 @@ const windowStyle = computed(() => {
   return baseStyle
 })
 
-const { isDragInitiated, isDragging, handleDragStart } = useDragAndDrop({
-  onPositionUpdate: (coordinate) => {
-    if (!isMaximized.value) {
-      windowPosition.value = {
-        x: coordinate.x,
-        y: coordinate.y,
-      }
-    }
-  },
-  threshold: 5,
-  elementSize: {
-    width: windowSize.value.width,
-    height: windowSize.value.height,
-  },
-})
-
-const startWindowDrag = (event: MouseEvent) => {
-  if (isMaximized.value) return
-
-  handleDragStart(event, {
-    x: windowPosition.value.x,
-    y: windowPosition.value.y,
-  })
-}
-
 const toggleMaximize = () => {
+  taskStore.makeActive(props.id)
   isMaximized.value = !isMaximized.value
 }
 
@@ -113,12 +127,17 @@ const closeWindow = () => {
     :class="{
       maximized: isMaximized,
       dragging: isDragging,
-      'drag-initiated': isDragInitiated,
+      'drag-initiated': isDragInitialized,
     }"
     :style="windowStyle"
   >
     <!-- Заголовок окна -->
-    <div class="title-bar" @mousedown="startWindowDrag" @dblclick="toggleMaximize">
+    <div
+      class="title-bar"
+      ref="titleBar"
+      @dblclick="toggleMaximize"
+      @mousedown="() => taskStore.makeActive(id)"
+    >
       <div class="title-content">
         <div class="window-icon">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -200,7 +219,7 @@ const closeWindow = () => {
           <h3>Содержимое окна</h3>
           <p>Здесь может быть любой контент окна.</p>
           <div class="debug-info" v-if="isDragging">
-            <p>Позиция: {{ windowPosition.x.toFixed(1) }}%, {{ windowPosition.y.toFixed(1) }}%</p>
+            <p>Позиция: {{ x }}px, {{ y }}px</p>
             <p>Перетаскивается: {{ isDragging }}</p>
           </div>
         </div>
@@ -338,6 +357,8 @@ const closeWindow = () => {
   background: #1e2328;
   color: #e2e8f0;
   overflow: auto;
+  pointer-events: none;
+  user-select: none;
 }
 
 .default-content {

@@ -7,6 +7,7 @@ import { percentToPixels } from '@/shared/helpers'
 export const useShortcutsStore = defineStore('shortcuts', () => {
   const usersStore = useUsersStore()
   const shortcuts = ref<ShortcutEntity[]>([])
+  const isDragging = ref(true)
 
   const loadShortcuts = async () => {
     if (!usersStore.currentUser) return []
@@ -136,6 +137,7 @@ export const useShortcutsStore = defineStore('shortcuts', () => {
 
   return {
     shortcuts,
+    isDragging,
     loadShortcuts,
     addShortcut,
     updateShortcut,
